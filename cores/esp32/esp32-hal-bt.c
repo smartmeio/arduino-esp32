@@ -55,9 +55,11 @@ bool btStart(){
 
 bool btStop(){
     if(esp_bt_controller_get_status() == ESP_BT_CONTROLLER_STATUS_IDLE){
+		log_i("bt stopped");
         return true;
     }
     if(esp_bt_controller_get_status() == ESP_BT_CONTROLLER_STATUS_ENABLED){
+		log_i("bt enabled");
         if (esp_bt_controller_disable()) {
             log_e("BT Disable failed");
             return false;
@@ -65,14 +67,12 @@ bool btStop(){
         while(esp_bt_controller_get_status() == ESP_BT_CONTROLLER_STATUS_ENABLED);
     }
     if(esp_bt_controller_get_status() == ESP_BT_CONTROLLER_STATUS_INITED){
-        if (esp_bt_controller_deinit()) {
+		log_i("inited");
+		if (esp_bt_controller_deinit()) {
 			log_e("BT deint failed");
 			return false;
 		}
-		vTaskDelay(1);
-		if (esp_bt_controller_get_status() != ESP_BT_CONTROLLER_STATUS_IDLE) {			
-			return false;		
-		}
+		while (esp_bt_controller_get_status() == ESP_BT_CONTROLLER_STATUS_INITED);
         return true;
     }
     log_e("BT Stop failed");
